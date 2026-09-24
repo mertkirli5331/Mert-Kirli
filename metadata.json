@@ -1,0 +1,7 @@
+{
+  "name": "Mert Kirli - 30 Haftalık Okul Menüsü ve Ödev Takibi",
+  "description": "Mert Kirli Okul Portalı: 30 haftalık okul yemek menüsü ve günlük interaktif ödev takip mobil uygulaması.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
