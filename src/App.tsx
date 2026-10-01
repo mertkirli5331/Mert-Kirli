@@ -12,8 +12,11 @@ import { WeeksGridModal } from './components/WeeksGridModal';
 import { PrintModal } from './components/PrintModal';
 import { ProfileModal } from './components/ProfileModal';
 import { AllHomeworksView } from './components/AllHomeworksView';
+import { GoogleDriveWeekPanel } from './components/GoogleDriveWeekPanel';
 import { MobileBottomNav, ActiveTab } from './components/MobileBottomNav';
 import { MobileFrame } from './components/MobileFrame';
+import { initAuth } from './services/googleDriveService';
+import { User } from 'firebase/auth';
 import {
   Sparkles,
   CalendarCheck,
@@ -23,7 +26,8 @@ import {
   Share2,
   ChevronRight,
   Flame,
-  Award
+  Award,
+  HardDrive
 } from 'lucide-react';
 
 const STORAGE_KEYS = {
@@ -112,6 +116,24 @@ export default function App() {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  // Google Drive Auth State
+  const [googleUser, setGoogleUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = initAuth(
+      (user, token) => {
+        setGoogleUser(user);
+        setAccessToken(token);
+      },
+      () => {
+        setGoogleUser(null);
+        setAccessToken(null);
+      }
+    );
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (toastMessage) {
@@ -316,6 +338,8 @@ export default function App() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onOpenWeeksGrid={() => setIsWeeksGridOpen(true)}
         onOpenPrint={() => setIsPrintModalOpen(true)}
+        isDriveConnected={!!googleUser && !!accessToken}
+        onOpenDrive={() => setActiveTab('drive')}
       />
 
       {/* 30-Week Horizontal Carousel / Bar */}
@@ -361,6 +385,21 @@ export default function App() {
                 <span className="ml-1 px-1.5 py-0.2 bg-amber-400 text-amber-950 rounded-full text-[10px]">
                   {pendingWeekCount}
                 </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('drive')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl transition relative ${
+                activeTab === 'drive'
+                  ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-cyan-950 shadow-md font-black'
+                  : 'text-cyan-200 hover:text-white'
+              }`}
+            >
+              <HardDrive className="w-3.5 h-3.5" />
+              <span>{selectedWeek}. Hafta Drive</span>
+              {googleUser && (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" title="Google Drive Bağlı"></span>
               )}
             </button>
           </div>
@@ -411,6 +450,37 @@ export default function App() {
                 />
               </div>
             </div>
+
+            {/* Weekly Google Drive Quick Callout Card */}
+            <div className="bg-gradient-to-r from-[#003842] via-[#004752] to-[#004f5b] rounded-3xl p-4 sm:p-5 border border-cyan-400/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shrink-0">
+                  <HardDrive className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-black text-white">
+                      {selectedWeek}. Hafta Google Drive Arşivi
+                    </h4>
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-200 border border-cyan-500/30">
+                      {googleUser ? 'Bulut Bağlı' : 'Drive Bağlanabilir'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-cyan-100/80 font-medium mt-0.5">
+                    Bu haftanın ders dokümanları, ödev notları ve haftalık yemek çizelgesi Google Drive klasörünüzde.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setActiveTab('drive')}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-cyan-400 hover:bg-cyan-300 text-cyan-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-95 shadow-md shrink-0 cursor-pointer"
+              >
+                <HardDrive className="w-4 h-4" />
+                <span>{selectedWeek}. Hafta Drive Klasörünü Yönet</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         ) : activeTab === 'all-homeworks' ? (
           <AllHomeworksView
@@ -421,6 +491,23 @@ export default function App() {
             onOpenAddModal={handleOpenAddModal}
             onOpenEditModal={handleOpenEditModal}
             onSelectWeek={(w) => setSelectedWeek(w)}
+          />
+        ) : activeTab === 'drive' ? (
+          <GoogleDriveWeekPanel
+            currentWeek={selectedWeek}
+            weekMenu={currentWeekMenu}
+            weekHomeworks={weekHomeworks}
+            currentUser={googleUser}
+            accessToken={accessToken}
+            onAuthSuccess={(user, token) => {
+              setGoogleUser(user);
+              setAccessToken(token);
+            }}
+            onSignOut={() => {
+              setGoogleUser(null);
+              setAccessToken(null);
+            }}
+            onToast={(msg) => setToastMessage(msg)}
           />
         ) : null}
 
@@ -434,6 +521,12 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveTab('drive')}
+              className="text-cyan-300 hover:text-white underline font-semibold cursor-pointer"
+            >
+              Haftalık Drive
+            </button>
             <button
               onClick={() => setIsWeeksGridOpen(true)}
               className="text-cyan-300 hover:text-white underline font-semibold"

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Utensils, ListTodo, CalendarDays, User, Sparkles } from 'lucide-react';
+import { Utensils, ListTodo, CalendarDays, User, Sparkles, HardDrive } from 'lucide-react';
 
-export type ActiveTab = 'day-view' | 'all-homeworks' | 'weeks-grid' | 'profile';
+export type ActiveTab = 'day-view' | 'all-homeworks' | 'drive' | 'weeks-grid' | 'profile';
 
 interface MobileBottomNavProps {
   activeTab: ActiveTab;
@@ -33,7 +33,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             <Utensils className="w-5 h-5" />
           </div>
-          <span className="text-[10px]">Menü & Gün</span>
+          <span className="text-[10px]">Menü</span>
         </button>
 
         {/* All Homeworks */}
@@ -57,7 +57,26 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               </span>
             )}
           </div>
-          <span className="text-[10px]">Ödevlerim</span>
+          <span className="text-[10px]">Ödevler</span>
+        </button>
+
+        {/* Google Drive for Weeks */}
+        <button
+          onClick={() => onSelectTab('drive')}
+          className={`flex flex-col items-center gap-1 transition ${
+            activeTab === 'drive'
+              ? 'text-cyan-300 font-bold scale-105'
+              : 'text-cyan-200/60 hover:text-cyan-200'
+          }`}
+        >
+          <div
+            className={`p-1.5 rounded-xl ${
+              activeTab === 'drive' ? 'bg-cyan-400/20' : ''
+            }`}
+          >
+            <HardDrive className="w-5 h-5" />
+          </div>
+          <span className="text-[10px]">Drive</span>
         </button>
 
         {/* 30 Weeks Map */}
@@ -95,7 +114,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             <User className="w-5 h-5" />
           </div>
-          <span className="text-[10px]">Mert Kirli</span>
+          <span className="text-[10px]">Profil</span>
         </button>
       </div>
     </nav>

@@ -61,3 +61,22 @@ export interface UserProfile {
   streakDays: number;
   points: number;
 }
+
+export interface DriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  webViewLink?: string;
+  webContentLink?: string;
+  iconLink?: string;
+  size?: string;
+  createdTime?: string;
+  modifiedTime?: string;
+}
+
+export interface WeekDriveFolder {
+  id: string;
+  name: string;
+  webViewLink: string;
+}
+

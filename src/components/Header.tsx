@@ -8,7 +8,8 @@ import {
   CalendarDays,
   CheckCircle2,
   User,
-  Sparkles
+  Sparkles,
+  HardDrive
 } from 'lucide-react';
 import { UserProfile } from '../types';
 
@@ -23,6 +24,8 @@ interface HeaderProps {
   onOpenProfile: () => void;
   onOpenWeeksGrid: () => void;
   onOpenPrint: () => void;
+  isDriveConnected: boolean;
+  onOpenDrive: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +39,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfile,
   onOpenWeeksGrid,
   onOpenPrint,
+  isDriveConnected,
+  onOpenDrive,
 }) => {
   const completionRate = totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0;
 
@@ -96,6 +101,29 @@ export const Header: React.FC<HeaderProps> = ({
             <CalendarDays className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-300" />
             <span className="font-bold text-white">{currentWeek}</span>
             <span className="text-cyan-200/70">/{totalWeeks}. Hafta</span>
+          </button>
+
+          {/* Google Drive Status & Quick Jump */}
+          <button
+            onClick={onOpenDrive}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition ${
+              isDriveConnected
+                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border-emerald-400/40'
+                : 'bg-cyan-950/50 hover:bg-cyan-900/70 text-cyan-200 border-cyan-400/20'
+            }`}
+            title={
+              isDriveConnected
+                ? `${currentWeek}. Hafta Google Drive Klasörünü Aç (Bağlı)`
+                : 'Google Drive ile Haftalık Dosyaları Yönet'
+            }
+          >
+            <HardDrive className={`w-3.5 h-3.5 ${isDriveConnected ? 'text-emerald-400' : 'text-cyan-300'}`} />
+            <span className="hidden sm:inline font-bold">
+              {isDriveConnected ? 'Drive Bağlı' : 'Drive'}
+            </span>
+            {isDriveConnected && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            )}
           </button>
 
           {/* Print / Save View */}
