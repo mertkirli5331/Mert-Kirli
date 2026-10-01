@@ -111,6 +111,14 @@ export default function App() {
   const [isWeeksGridOpen, setIsWeeksGridOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(null), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   // Sync to localStorage
   useEffect(() => {
@@ -283,10 +291,12 @@ export default function App() {
           setWeeks(parsed.weeks);
           setHomeworks(parsed.homeworks);
           if (parsed.userProfile) setUserProfile(parsed.userProfile);
-          alert('Veriler başarıyla yüklendi!');
+          setToastMessage({ text: 'Veriler başarıyla yüklendi!', type: 'success' });
+        } else {
+          setToastMessage({ text: 'Geçersiz dosya formatı.', type: 'error' });
         }
       } catch {
-        alert('Geçersiz dosya formatı.');
+        setToastMessage({ text: 'Geçersiz dosya formatı.', type: 'error' });
       }
     };
     reader.readAsText(file);
@@ -500,6 +510,26 @@ export default function App() {
         onExportData={handleExportData}
         onImportData={handleImportData}
       />
+
+      {/* Non-blocking Toast Notification */}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`fixed top-5 right-5 z-[9999] px-4 py-3 rounded-2xl shadow-2xl border text-sm font-bold flex items-center gap-2 transition-all duration-300 animate-in fade-in slide-in-from-top-2 ${
+            toastMessage.type === 'success'
+              ? 'bg-emerald-600 text-white border-emerald-400'
+              : 'bg-red-600 text-white border-red-400'
+          }`}
+        >
+          {toastMessage.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+          ) : (
+            <span className="w-2 h-2 rounded-full bg-white shrink-0" />
+          )}
+          <span>{toastMessage.text}</span>
+        </div>
+      )}
     </div>
   );
 

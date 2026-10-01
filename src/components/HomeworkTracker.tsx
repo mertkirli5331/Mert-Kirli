@@ -300,11 +300,7 @@ export const HomeworkTracker: React.FC<HomeworkTrackerProps> = ({
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm(`"${hw.title}" ödevini silmek istediğinize emin misiniz?`)) {
-                          onDeleteHomework(hw.id);
-                        }
-                      }}
+                      onClick={() => onDeleteHomework(hw.id)}
                       className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                       title="Ödevi Sil"
                     >

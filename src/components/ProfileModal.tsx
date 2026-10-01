@@ -41,6 +41,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [schoolName, setSchoolName] = useState(userProfile.schoolName);
   const [grade, setGrade] = useState(userProfile.grade);
   const [studentNumber, setStudentNumber] = useState(userProfile.studentNumber);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   if (!isOpen) return null;
 
@@ -235,22 +236,39 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               </label>
             </div>
 
-            <button
-              onClick={() => {
-                if (
-                  confirm(
-                    'Tüm ödev ve menü verilerini ilk haline sıfırlamak istiyor musunuz?'
-                  )
-                ) {
-                  onResetData();
-                  onClose();
-                }
-              }}
-              className="w-full flex items-center justify-center gap-1 p-2 rounded-xl text-red-600 hover:bg-red-50 border border-red-200 font-bold transition"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Varsayılan Verilere Sıfırla</span>
-            </button>
+            {showResetConfirm ? (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl space-y-2 mt-2">
+                <p className="text-red-700 font-medium text-center">
+                  Tüm ödev ve menü verilerini ilk haline sıfırlamak istiyor musunuz?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      onResetData();
+                      setShowResetConfirm(false);
+                      onClose();
+                    }}
+                    className="flex-1 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition text-xs"
+                  >
+                    Evet, Sıfırla
+                  </button>
+                  <button
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold transition text-xs"
+                  >
+                    Vazgeç
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                className="w-full flex items-center justify-center gap-1 p-2 rounded-xl text-red-600 hover:bg-red-50 border border-red-200 font-bold transition"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Varsayılan Verilere Sıfırla</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
